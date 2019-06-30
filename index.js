@@ -4,7 +4,7 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const port = 8080;
+const port = 8000;
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname + '/index.html'));
@@ -12,4 +12,6 @@ app.get('/', (req, res) => {
 
 app.use(express.static('.'));
 
-app.listen(port, () => console.log(`WatchWithMe app listening on port ${port}!`));
+server = app.listen(port, () => console.log(`WatchWithMe app listening on port ${port}!`));
+
+module.exports = server;
