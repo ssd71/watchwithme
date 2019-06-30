@@ -4,7 +4,8 @@
   "description": "An app that let's you watch local videos together",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha"
+    "test": "./node_modules/.bin/mocha",
+    "start": "node index.js"
   },
   "author": "Shibani S. Dash",
   "license": "MIT",
@@ -13,7 +14,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^6.1.4",
-    "request": "^2.88.0"
+    "chai-http": "^4.3.0",
+    "mocha": "^6.1.4"
   }
 }

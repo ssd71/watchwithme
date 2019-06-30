@@ -1,9 +1,23 @@
-var expect = require('chai').expect;
+var server = require('../index');
+var chai = require('chai');
+var chaiHttp = require('chai-http');
 var request = require('request');
 
-it('Main page status', function(done) {
-    request('http://localhost:8080' , function(error, response, body) {
-        expect(response.statusCode).to.equal(200);
+
+chai.use(chaiHttp);
+chai.should();
+
+describe('Loading Express', () => {
+
+  it('Main page status', function(done) {
+    chai.request(server)
+      .get('/')
+      .end((err, resp) => {
+        resp.should.have.status(200);
+        server.close();
         done();
-    });
-});
+      })
+
+  });
+
+})
