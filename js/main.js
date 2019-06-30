@@ -1,24 +1,24 @@
 
-'use strict'
+'use strict';
 
-var fileInput = document.getElementById("fileinput");
-var startButton = document.getElementById("startButton");
-var peerid = document.getElementById("peerid");
-var myid = document.getElementById("myid");
-var readytext = document.getElementById("readytext");
-var fileloaded = false,
-haveid = false,
-playing = false;
-var myPlayer = videojs('my-video');
-let peer,
-conn;
+const fileInput = document.getElementById('fileinput');
+const startButton = document.getElementById('startButton');
+const peerid = document.getElementById('peerid');
+const myid = document.getElementById('myid');
+const readytext = document.getElementById('readytext');
+let fileloaded = false;
+let haveid = false;
+let playing = false;
+const myPlayer = videojs('my-video');
+let peer;
+let conn;
 
 fileInput.onchange = () => {
-  console.log("fileinput onchange");
+  console.log('fileinput onchange');
   fileloaded = true;
   peer = new Peer();
   peer.on('open', (id) => {
-    console.log("peerjs started with id "+ id);
+    console.log('peerjs started with id '+ id);
     myid.textContent = id;
   });
   peer.on('connection', handleincoming);
@@ -28,59 +28,76 @@ fileInput.onchange = () => {
 };
 
 peerid.oninput = () => {
-  console.log("peerid on input");
+  console.log('peerid on input');
   haveid = true;
   if (fileloaded && haveid) {
     startButton.disabled = false;
   }
 };
 
+/**
+* Loads media file specified in the file input field, for playing
+*
+*/
 function readyPlayer() {
-  var filename = fileInput.files[0].name;
-  var fileUrl = URL.createObjectURL(fileInput.files[0]);
-  var fileType = fileInput.files[0].type;
+  const filename = fileInput.files[0].name;
+  const fileUrl = URL.createObjectURL(fileInput.files[0]);
+  const fileType = fileInput.files[0].type;
   console.log(filename);
-  myPlayer.src({ type: fileType, src: fileUrl });
+  myPlayer.src({type: fileType, src: fileUrl});
   myPlayer.load();
-  myPlayer.on("play", () => conn.send("PLAY"));
-  myPlayer.on("pause", () => conn.send("PAUSE"));
-  readytext.textContent = "Press play to start!"
+  myPlayer.on('play', () => conn.send('PLAY'));
+  myPlayer.on('pause', () => conn.send('PAUSE'));
+  readytext.textContent = 'Press play to start!';
 }
 
-startButton.addEventListener('click', function () {
+startButton.addEventListener('click', function() {
   // ready
-  console.log("connecting to "+ peerid.value);
+  console.log('connecting to '+ peerid.value);
   conn = peer.connect(peerid.value);
-  conn.on("open", () => console.log("connection now open"));
-  conn.on("data", onData);
-  conn.send("READY");
+  conn.on('open', () => console.log('connection now open'));
+  conn.on('data', onData);
+  conn.send('READY');
   readyPlayer();
 });
 
+
+/**
+  * Handles incoming connections by attaching onData event listener.
+  *
+  * @param {DataConnection} con The incoming connection object.
+  *
+*
+*/
 function handleincoming(con) {
   conn = con;
   readyPlayer();
-  conn.on("open", () => {
-    console.log("incoming connection");
+  conn.on('open', () => {
+    console.log('incoming connection');
 
-    conn.on("data", onData);
+    conn.on('data', onData);
   });
-
 }
 
+
+/**
+  * Handles the 'data' event of a DataConnection object
+  *
+  * @param {*} data The data received.
+  */
 function onData(data) {
-  console.log("got data "+data);
-  if (data == "READY") {
-    if (myPlayer.readyState() == 0){
+  console.log('got data '+data);
+  if (data == 'READY') {
+    if (myPlayer.readyState() == 0) {
       readyPlayer();
-      conn.send("READY");
+      conn.send('READY');
     }
-  } else if (data == "PLAY") {
+  } else if (data == 'PLAY') {
     if (!playing) {
       myPlayer.play();
       playing = true;
     }
-  } else if (data == "PAUSE"){
+  } else if (data == 'PAUSE') {
     if (playing) {
       myPlayer.pause();
       playing = false;
